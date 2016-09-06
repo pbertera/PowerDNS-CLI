@@ -12,6 +12,7 @@ Changes:
 
 """
 
+import os
 import argparse
 import json
 import requests
@@ -261,7 +262,7 @@ class PDNSControl(object):
         parser.add_argument('action', help='Define action to take',
                             choices=['add_record', 'add_zone', 'delete_record',
                                      'delete_zone', 'query_config', 'query_stats', 'query_zone'])
-        parser.add_argument('--apikey', help='PDNS API Key', default='changeme')
+        parser.add_argument('--apikey', help='PDNS API Key', default=os.environ['API_KEY'])
         parser.add_argument('--apihost', help='PDNS API Host', default='127.0.0.1')
         parser.add_argument('--apiport', help='PDNS API Port', default='8081')
         parser.add_argument('--content', help='DNS Record content')
