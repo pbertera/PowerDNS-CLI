@@ -277,7 +277,7 @@ class PDNSControl(object):
         parser.add_argument('--recordType', help='DNS record type',
                             choices=['A', 'AAAA', 'CNAME', 'MX', 'NS', 'PTR', 'SOA', 'SRV', 'TXT', 'NAPTR'])
         parser.add_argument('--setPTR', help='Define if PTR record is created',
-                            choices=['True', 'False'], default=False)
+                            action='store_true', default=False)
         parser.add_argument('--ttl', help='Define TTL', default=3600)
         parser.add_argument('--zone', help='DNS zone')
         parser.add_argument('--zoneType', help='DNS Zone Type',
