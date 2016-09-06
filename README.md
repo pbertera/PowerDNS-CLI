@@ -19,12 +19,12 @@ Main changes to the original script:
 ```
 # python3 pdns.py -h
 usage: pdns.py [-h] [--apikey APIKEY] [--apihost APIHOST] [--apiport APIPORT]
-               [--content CONTENT] [--disabled {True,False}]
+               [--content CONTENT] [--disabled]
                [--masters MASTERS] [--name NAME] [--nameserver NAMESERVER]
                [--priority PRIORITY]
                [--recordType {A,AAAA,CNAME,MX,NS,PTR,SOA,SRV,TXT,NAPTR}]
-               [--setPTR {True,False}] [--ttl TTL] [--zone ZONE]
-               [--zoneType {MASTER,NATIVE,SLAVE}] [--debug {True,False}]
+               [--setPTR] [--ttl TTL] [--zone ZONE]
+               [--zoneType {MASTER,NATIVE,SLAVE}] [--debug]
                {add_records,add_zones,delete_records,delete_zones,query_config,query_stats,query_zones}
 
 PDNS Controls...
@@ -39,8 +39,7 @@ optional arguments:
   --apihost APIHOST     PDNS API Host
   --apiport APIPORT     PDNS API Port
   --content CONTENT     DNS Record content
-  --disabled {True,False}
-                        Define if Record is disabled
+  --disabled            Define if Record is disabled
   --master MASTER       DNS zone master, can be specified multiple times
   --name NAME           DNS record name
   --nameserver NAMESERVER
@@ -48,8 +47,7 @@ optional arguments:
   --priority PRIORITY   Define priority
   --recordType {A,AAAA,CNAME,MX,NS,PTR,SOA,SRV,TXT,NAPTR}
                         DNS record type
-  --setPTR {True,False}
-                        Define if PTR record is created
+  --setPTR              Define if PTR record is created
   --ttl TTL             Define TTL
   --zone ZONE           DNS zone
   --zoneType {MASTER,NATIVE,SLAVE}
