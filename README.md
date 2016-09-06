@@ -20,7 +20,7 @@ Main changes to the original script:
 # python3 pdns.py -h
 usage: pdns.py [-h] [--apikey APIKEY] [--apihost APIHOST] [--apiport APIPORT]
                [--content CONTENT] [--disabled {True,False}]
-               [--masters MASTERS] [--name NAME] [--nameservers NAMESERVERS]
+               [--masters MASTERS] [--name NAME] [--nameserver NAMESERVER]
                [--priority PRIORITY]
                [--recordType {A,AAAA,CNAME,MX,NS,PTR,SOA,SRV,TXT,NAPTR}]
                [--setPTR {True,False}] [--ttl TTL] [--zone ZONE]
@@ -41,10 +41,10 @@ optional arguments:
   --content CONTENT     DNS Record content
   --disabled {True,False}
                         Define if Record is disabled
-  --masters MASTERS     DNS zone masters
+  --master MASTER       DNS zone master, can be specified multiple times
   --name NAME           DNS record name
-  --nameservers NAMESERVERS
-                        DNS nameservers for zone
+  --nameserver NAMESERVER
+                        DNS nameserver for zone, can be specified multiple times
   --priority PRIORITY   Define priority
   --recordType {A,AAAA,CNAME,MX,NS,PTR,SOA,SRV,TXT,NAPTR}
                         DNS record type
@@ -54,7 +54,7 @@ optional arguments:
   --zone ZONE           DNS zone
   --zoneType {MASTER,NATIVE,SLAVE}
                         DNS Zone Type
-  --debug {True,False}  Enable debug
+  --debug               Enable debug
 ```
 
 ## Adding a DNS zone
@@ -62,7 +62,7 @@ optional arguments:
 The following commands adds the new MASTER zone `example.com`the PowerDNS API Key is `MyAPIKey` the nameserver is `ns.example.com`
 
 ```
-./pdns.py  --apikey MyAPIKey --apihost 127.0.0.1 --apiport 80 --zone example.com. --zoneType MASTER --nameservers ns.example.com. --debug True add_zone
+./pdns.py  --apikey MyAPIKey --apihost 127.0.0.1 --apiport 80 --zone example.com. --zoneType MASTER --nameserver ns.example.com. --debug True add_zone
 2016-09-05 23:55:15,591 pdns         DEBUG    sending GET request to http://127.0.0.1:80/api/v1/servers/localhost/zones/example.com.
 2016-09-05 23:55:15,615 pdns         DEBUG    returned 422 {"error": "Could not find domain 'example.com.'"}
 2016-09-05 23:55:15,616 pdns         DEBUG    sending POST request to http://127.0.0.1:80/api/v1/servers/localhost/zones
@@ -74,7 +74,7 @@ The following commands adds the new MASTER zone `example.com`the PowerDNS API Ke
 ### Adding a zone with multiple NS
 
 ```
-./pdns.py  --apikey MyAPIKey --apihost 127.0.0.1 --apiport 80 --zone example.com. --zoneType MASTER --nameservers ns1.example.com.,ns2.example.com. --debug True add_zone
+./pdns.py  --apikey MyAPIKey --apihost 127.0.0.1 --apiport 80 --zone example.com. --zoneType MASTER --nameserver ns1.example.com.,ns2.example.com. --debug True add_zone
 2016-09-06 00:00:55,286 pdns         DEBUG    sending GET request to http://127.0.0.1:80/api/v1/servers/localhost/zones/example.com.
 2016-09-06 00:00:55,379 pdns         DEBUG    returned 422 {"error": "Could not find domain 'example.com.'"}
 2016-09-06 00:00:55,379 pdns         DEBUG    sending POST request to http://127.0.0.1:80/api/v1/servers/localhost/zones

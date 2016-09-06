@@ -52,6 +52,16 @@ class PDNSControl(object):
             name = self.args.name
         else:
             name = self.args.name + '.' + self.args.zone
+        records = []
+        for content in self.args.content:
+            records.append({
+                            "content": content,
+                            "disabled": self.args.disabled,
+                            "name": name,
+                            "set-ptr": self.args.setPTR,
+                            "type": self.args.recordType,
+                            "priority": self.args.priority
+                    })
         payload = {
             "rrsets": [
                 {
@@ -59,16 +69,7 @@ class PDNSControl(object):
                     "type": self.args.recordType,
                     "changetype": "REPLACE",
                     "ttl": self.args.ttl,
-                    "records": [
-                        {
-                            "content": self.args.content,
-                            "disabled": self.args.disabled,
-                            "name": name,
-                            "set-ptr": self.args.setPTR,
-                            "type": self.args.recordType,
-                            "priority": self.args.priority
-                        }
-                    ]
+                    "records": records,
                 }
             ]
         }
@@ -97,34 +98,26 @@ class PDNSControl(object):
 
         Create Master, Native or Slave zones
         """
-        masters = []
-        nameservers = []
-        if self.args.masters:
-            for master in self.args.masters.split(','):
-                masters.append(master)
-        if self.args.nameservers:
-            for nameserver in self.args.nameservers.split(','):
-                nameservers.append(nameserver)
         if self.args.zoneType == "MASTER":
             payload = {
                 "name": self.args.zone,
                 "kind": self.args.zoneType,
                 "masters": [],
                 "soa_edit_api": "INCEPTION-INCREMENT",
-                "nameservers": nameservers
+                "nameservers": self.args.nameserver
             }
         elif self.args.zoneType == "NATIVE":
             payload = {
                 "name": self.args.zone,
                 "kind": self.args.zoneType,
                 "masters": [],
-                "nameservers": nameservers
+                "nameservers": self.args.nameserver
             }
         else:
             payload = {
                 "name": self.args.zone,
                 "kind": self.args.zoneType,
-                "masters": masters,
+                "masters": self.args.master,
                 "nameservers": []
             }
 
@@ -274,12 +267,12 @@ class PDNSControl(object):
         parser.add_argument('--apikey', help='PDNS API Key', default=def_api_key)
         parser.add_argument('--apihost', help='PDNS API Host', default='127.0.0.1')
         parser.add_argument('--apiport', help='PDNS API Port', default=def_web_port)
-        parser.add_argument('--content', help='DNS Record content')
+        parser.add_argument('--content', help='DNS Record content, can be specified multiple times', action='append')
         parser.add_argument('--disabled', help='Define if Record is disabled',
-                            choices=['True', 'False'], default=False)
-        parser.add_argument('--masters', help='DNS zone masters')
+                            action='store_true', default=False)
+        parser.add_argument('--master', help='DNS zone master, can be specified multiple times', action='append')
         parser.add_argument('--name', help='DNS record name')
-        parser.add_argument('--nameservers', help='DNS nameservers for zone, multiple server separated by comma')
+        parser.add_argument('--nameserver', help='DNS nameserver for zone, can be specified multiple times', action='append')
         parser.add_argument('--priority', help='Define priority', default=0)
         parser.add_argument('--recordType', help='DNS record type',
                             choices=['A', 'AAAA', 'CNAME', 'MX', 'NS', 'PTR', 'SOA', 'SRV', 'TXT', 'NAPTR'])
@@ -289,14 +282,14 @@ class PDNSControl(object):
         parser.add_argument('--zone', help='DNS zone')
         parser.add_argument('--zoneType', help='DNS Zone Type',
                             choices=['MASTER', 'NATIVE', 'SLAVE'])
-        parser.add_argument('--debug', help='Enable debug', choices=['True', 'False'], default=False)
+        parser.add_argument('--debug', help='Enable debug', action='store_true', default=False)
         self.args = parser.parse_args()
         if self.args.action == "add_zone" and (self.args.zoneType == "MASTER" and
-                                                self.args.nameservers is None):
-            parser.error("--nameservers is required to create MASTER zone")
+                                                self.args.nameserver is None):
+            parser.error("--nameserver is required to create MASTER zone")
         if self.args.action == "add_zone" and (self.args.zoneType == "SLAVE" and
-                                                self.args.masters is None):
-            parser.error("--masters is required to create SLAVE zone")
+                                                self.args.master is None):
+            parser.error("--master is required to create SLAVE zone")
 
     def setup_api_call(self):
         """
