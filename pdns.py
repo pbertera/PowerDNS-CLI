@@ -258,13 +258,22 @@ class PDNSControl(object):
 
         Read CLI variables passed on CLI
         """
+        try:
+            def_api_key = os.environ['API_KEY']
+        except KeyError:
+            def_api_key = "changeme"
+        try:
+            def_web_port = os.environ['WEB_PORT']
+        except KeyError:
+            def_web_port = '8081'
+
         parser = argparse.ArgumentParser(description='PDNS Controls...')
         parser.add_argument('action', help='Define action to take',
                             choices=['add_record', 'add_zone', 'delete_record',
                                      'delete_zone', 'query_config', 'query_stats', 'query_zone'])
-        parser.add_argument('--apikey', help='PDNS API Key', default=os.environ['API_KEY'])
+        parser.add_argument('--apikey', help='PDNS API Key', default=def_api_key)
         parser.add_argument('--apihost', help='PDNS API Host', default='127.0.0.1')
-        parser.add_argument('--apiport', help='PDNS API Port', default=os.environ['WEB_PORT'])
+        parser.add_argument('--apiport', help='PDNS API Port', default=def_web_port)
         parser.add_argument('--content', help='DNS Record content')
         parser.add_argument('--disabled', help='Define if Record is disabled',
                             choices=['True', 'False'], default=False)
