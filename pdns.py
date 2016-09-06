@@ -264,7 +264,7 @@ class PDNSControl(object):
                                      'delete_zone', 'query_config', 'query_stats', 'query_zone'])
         parser.add_argument('--apikey', help='PDNS API Key', default=os.environ['API_KEY'])
         parser.add_argument('--apihost', help='PDNS API Host', default='127.0.0.1')
-        parser.add_argument('--apiport', help='PDNS API Port', default='8081')
+        parser.add_argument('--apiport', help='PDNS API Port', default=os.environ['WEB_PORT'])
         parser.add_argument('--content', help='DNS Record content')
         parser.add_argument('--disabled', help='Define if Record is disabled',
                             choices=['True', 'False'], default=False)
