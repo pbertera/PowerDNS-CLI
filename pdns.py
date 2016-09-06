@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 pdns.py: Manage PowerDNS Zones/Records
 
