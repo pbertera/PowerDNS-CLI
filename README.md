@@ -140,6 +140,46 @@ Adding a `NAPTR` record with value `10 10 "S" "SIP+D2U" "" _sip._udp.example.com
 2016-09-06 00:10:30,137 pdns         INFO     DNS Record 'example.com.' Successfully Added/Updated
 ```
 
+### Adding multiple NAPTR record
+
+Adding 3 `NAPTR`records:
+
+* `10 10 "S" "SIPS+D2T" "" _sips._tcp.wonderland.com.`
+* `20 10 "S" "SIP+D2T" "" _sip._tcp.wonderland.com.`
+* `30 10 "S" "SIP+D2U" "" _sip._udp.wonderland.com.`
+
+```
+./pdns.py --zone wonderland.com. --content "10 10 \"S\" \"SIPS+D2T\" \"\" _sips._tcp.wonderland.com." --content "20 10 \"S\" \"SIP+D2T\" \"\" _sip._tcp.wonderland.com." --content "30 10 \"S\" \"SIP+D2U\" \"\" _sip._udp.wonderland.com." --name wonderland.com. --recordType=NAPTR add_record
+2016-11-09 07:30:32,386 pdns         INFO     DNS Record 'wonderland.com.' Successfully Added/Updated
+```
+
+Checking the result:
+
+```
+hank-2:~ pietro$ dig @localhost NAPTR wonderland.com 
+
+; <<>> DiG 9.8.3-P1 <<>> @localhost NAPTR wonderland.com
+; (2 servers found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 2252
+;; flags: qr aa rd; QUERY: 1, ANSWER: 3, AUTHORITY: 0, ADDITIONAL: 0
+;; WARNING: recursion requested but not available
+
+;; QUESTION SECTION:
+;wonderland.com.            IN  NAPTR
+
+;; ANSWER SECTION:
+wonderland.com.     3600    IN  NAPTR   20 10 "S" "SIP+D2T" "" _sip._tcp.wonderland.com.
+wonderland.com.     3600    IN  NAPTR   30 10 "S" "SIP+D2U" "" _sip._udp.wonderland.com.
+wonderland.com.     3600    IN  NAPTR   10 10 "S" "SIPS+D2T" "" _sips._tcp.wonderland.com.
+
+;; Query time: 8 msec
+;; SERVER: 127.0.0.1#53(127.0.0.1)
+;; WHEN: Wed Nov  9 08:30:35 2016
+;; MSG SIZE  rcvd: 193
+```
+
 ### Adding an SRV record
 
 Adding an `SRV` record with value 20 50 5060 pbx2.example.com.` for the name `_sip._udp.example.com.` *Please note that if you don't add the trailing dot (.) the zone name will be concatenated to the --name parameter*
