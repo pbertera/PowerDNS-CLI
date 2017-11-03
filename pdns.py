@@ -258,8 +258,6 @@ class PDNSControl(object):
         if r.status_code == 200:
             data = r.json()['rrsets']
             content = [v['records'][0]['content'] for v in data if v['type'] in 'A']
-            
-            #sc = set(content)
         else:
             print("DNS Zone '%s' Does Not Exist..." % self.args.zone)
             sys.exit(1)
