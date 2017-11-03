@@ -13,6 +13,7 @@ Changes:
 """
 
 import os
+import sys
 import argparse
 import json
 import requests
@@ -159,6 +160,8 @@ class PDNSControl(object):
             self.query_stats()
         elif self.args.action == "query_zone":
             self.query_zone()
+        elif self.args.action == "query_next_ip":
+            self.query_next_ip()
 
     def delete_record(self):
         """
@@ -245,6 +248,40 @@ class PDNSControl(object):
         else:
             print("DNS Zone '%s' Does Not Exist..." % self.args.zone)
 
+    def query_next_ip(self):
+        """
+        Query for next available IP in zone
+        """
+        logger.debug("sending GET request to %s" % self.uri)
+        r = requests.get(self.uri, headers=self.headers)
+        logger.debug("returned %d %s" % (r.status_code, r.text))
+        if r.status_code == 200:
+            data = r.json()['rrsets']
+            content = [v['records'][0]['content'] for v in data if v['type'] in 'A']
+        else:
+            print("DNS Zone '%s' Does Not Exist..." % self.args.zone)
+            sys.exit(1)
+
+        """ collect and sort based on subnet """
+        subnets = {}
+        for i in content:
+            net = '.'.join(i.split('.')[:3])
+            ip = int(i.split('.')[3])
+            if subnets.get(net, False):
+                subnets[net].append(ip)
+            else:
+                subnets[net] = [ip]
+
+        subnets[self.args.origin].sort()
+        logger.debug("{} IPs in use: {}".format(subnets[self.args.origin],subnets[self.args.origin]))
+        ip = self._find_gaps(subnets[self.args.origin])
+        print("{}.{}".format(self.args.origin, str(next(ip)[0])))
+
+    def _find_gaps(self, ips):
+        # keeping ranges away from network ranges
+        start, end = 11, 250
+        yield list(set(range(start, end + 1)).difference(ips))
+            
     def read_cli_args(self):
         """
         Read variables from CLI
@@ -263,7 +300,8 @@ class PDNSControl(object):
         parser = argparse.ArgumentParser(description='PDNS Controls...')
         parser.add_argument('action', help='Define action to take',
                             choices=['add_record', 'add_zone', 'delete_record',
-                                     'delete_zone', 'query_config', 'query_stats', 'query_zone'])
+                                     'delete_zone', 'query_config', 'query_stats', 'query_zone',
+                                     'query_next_ip'])
         parser.add_argument('--apikey', help='PDNS API Key', default=def_api_key)
         parser.add_argument('--apihost', help='PDNS API Host', default='127.0.0.1')
         parser.add_argument('--apiport', help='PDNS API Port', default=def_web_port)
@@ -273,6 +311,7 @@ class PDNSControl(object):
         parser.add_argument('--master', help='DNS zone master, can be specified multiple times', action='append')
         parser.add_argument('--name', help='DNS record name')
         parser.add_argument('--nameserver', help='DNS nameserver for zone, can be specified multiple times', action='append')
+        parser.add_argument('--origin', help='DNS zone origin ie. 10.35.50')
         parser.add_argument('--priority', help='Define priority', default=0)
         parser.add_argument('--recordType', help='DNS record type',
                             choices=['A', 'AAAA', 'CNAME', 'MX', 'NS', 'PTR', 'SOA', 'SRV', 'TXT', 'NAPTR'])
@@ -316,6 +355,9 @@ class PDNSControl(object):
         elif self.args.action == "query_stats":
             self.uri = ("http://%s:%s/api/v1/servers/localhost/statistics"
                         % (self.args.apihost, self.args.apiport))
+        elif self.args.action == "query_next_ip":
+            self.uri = ("http://%s:%s/api/v1/servers/localhost/zones/%s"
+                        % (self.args.apihost, self.args.apiport, self.args.zone))
 
 if __name__ == '__main__':
     PDNSControl()
