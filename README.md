@@ -25,12 +25,12 @@ usage: pdns.py [-h] [--apikey APIKEY] [--apihost APIHOST] [--apiport APIPORT]
                [--recordType {A,AAAA,CNAME,MX,NS,PTR,SOA,SRV,TXT,NAPTR}]
                [--setPTR] [--ttl TTL] [--zone ZONE]
                [--zoneType {MASTER,NATIVE,SLAVE}] [--debug]
-               {add_records,add_zones,delete_records,delete_zones,query_config,query_stats,query_zones}
+               {add_records,add_zones,delete_records,delete_zones,query_config,query_stats,query_zones,query_next_ip}
 
 PDNS Controls...
 
 positional arguments:
-  {add_record,add_zone,delete_record,delete_zone,query_config,query_stats,query_zone}
+  {add_record,add_zone,delete_record,delete_zone,query_config,query_stats,query_zone,query_next_ip}
                         Define action to take
 
 optional arguments:
@@ -44,6 +44,7 @@ optional arguments:
   --name NAME           DNS record name
   --nameserver NAMESERVER
                         DNS nameserver for zone, can be specified multiple times
+  --origin ORIGIN		ORIGIN or subnet to query, called with query_next_ip
   --priority PRIORITY   Define priority
   --recordType {A,AAAA,CNAME,MX,NS,PTR,SOA,SRV,TXT,NAPTR}
                         DNS record type
@@ -82,6 +83,15 @@ The following commands adds the new MASTER zone `example.com`the PowerDNS API Ke
 ```
 
 ## Managing zone records
+
+### Finding the next available IP in a zone
+```
+./pdns.py --zone las1.marqeta.com --origin 10.35.18 query_next_ip
+10.35.18.11
+
+./pdns.py --zone las1.marqeta.com --origin 10.35.53 query_next_ip
+10.35.53.18
+```
 
 ### Adding an A record
 
